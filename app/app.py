@@ -1,8 +1,12 @@
 from fastapi import FastAPI
-from app.schema import SummarizeRequest, SummarizeResponseList, prompts
 import requests
 from fastapi.middleware.cors import CORSMiddleware
+from app.schema import SummarizeRequest, SummarizeResponseList, prompts
+from app.config import OLLAMA_HOST_URL
 
+
+if not OLLAMA_HOST_URL:
+    raise RuntimeError("OLLAMA_HOST_URL is not set in .env")
 
 app= FastAPI()
 
@@ -23,7 +27,7 @@ async def summarize_text(request: SummarizeRequest):
         prompt = prompt_template.replace("{TEXT}", request.text)
 
         res = requests.post(
-            "http://localhost:11434/api/generate",
+            OLLAMA_HOST_URL,
             json={
                 "model": "llama3:latest",
                 "prompt": prompt,
